@@ -1,7 +1,7 @@
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
-  name: allowedrdsinstandcetypes
+  name: allowedrdsinstancetypes
   annotations:
     description: Restricts RDS DBInstance to approved instance types
 spec:
@@ -20,7 +20,7 @@ spec:
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
-        package allowedrdsinstandcetypes
+        package allowedrdsinstancetypes
         violation[{"msg": msg}] {
           instanceClass := input.review.object.spec.dbInstanceClass
           allowedTypes := input.parameters.allowedTypes

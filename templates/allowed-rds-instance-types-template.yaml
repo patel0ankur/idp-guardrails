@@ -1,0 +1,32 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: allowedrdsinstandcetypes
+  annotations:
+    description: Restricts RDS DBInstance to approved instance types
+spec:
+  crd:
+    spec:
+      names:
+        kind: AllowedRDSInstanceTypes
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            allowedTypes:
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package allowedrdsinstandcetypes
+        violation[{"msg": msg}] {
+          instanceClass := input.review.object.spec.dbInstanceClass
+          allowedTypes := input.parameters.allowedTypes
+          not allowed_type(instanceClass, allowedTypes)
+          msg := sprintf("RDS instance class '%v' is not approved. Allowed types: %v", [instanceClass, allowedTypes])
+        }
+        allowed_type(class, allowed) {
+          allowed[_] == class
+        }

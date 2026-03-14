@@ -1,0 +1,23 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: AllowedRDSInstanceTypes
+metadata:
+  name: rds-approved-instance-types
+  annotations:
+    description: RDS instances must use cost-approved instance types. Blocks expensive families.
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: ["rds.services.k8s.aws"]
+        kinds: ["DBInstance"]
+  parameters:
+    allowedTypes:
+      - db.t3.micro
+      - db.t3.small
+      - db.t3.medium
+      - db.t4g.micro
+      - db.t4g.small
+      - db.t4g.medium
+      - db.m5.large
+      - db.m6g.large
+      # Blocked: db.r6g.*, db.x2g.*, db.x1*, p3*, trn1*, etc.

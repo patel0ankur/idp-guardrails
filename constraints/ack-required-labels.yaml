@@ -1,0 +1,27 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: RequiredLabels
+metadata:
+  name: ack-resources-must-have-labels
+  annotations:
+    description: All ACK-provisioned AWS resources must have team, environment, and cost-center labels
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: ["s3.services.k8s.aws"]
+        kinds: ["Bucket"]
+      - apiGroups: ["rds.services.k8s.aws"]
+        kinds: ["DBInstance", "DBCluster"]
+      - apiGroups: ["sqs.services.k8s.aws"]
+        kinds: ["Queue"]
+      - apiGroups: ["dynamodb.services.k8s.aws"]
+        kinds: ["Table"]
+      - apiGroups: ["lambda.services.k8s.aws"]
+        kinds: ["Function"]
+      - apiGroups: ["secretsmanager.services.k8s.aws"]
+        kinds: ["Secret"]
+  parameters:
+    labels:
+      - team
+      - environment
+      - cost-center

@@ -1,0 +1,23 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: s3encryptionrequired
+  annotations:
+    description: Requires S3 buckets to have server-side KMS encryption configured
+spec:
+  crd:
+    spec:
+      names:
+        kind: S3EncryptionRequired
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package s3encryptionrequired
+        violation[{"msg": msg}] {
+          not has_encryption
+          msg := "S3 Bucket must have serverSideEncryptionConfiguration with aws:kms algorithm"
+        }
+        has_encryption {
+          rules := input.review.object.spec.serverSideEncryptionConfiguration.rules[_]
+          rules.applyServerSideEncryptionByDefault.sseAlgorithm == "aws:kms"
+        }

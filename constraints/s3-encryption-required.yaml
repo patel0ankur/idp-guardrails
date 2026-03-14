@@ -1,0 +1,12 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: S3EncryptionRequired
+metadata:
+  name: s3-kms-encryption-required
+  annotations:
+    description: All S3 buckets must have KMS server-side encryption configured
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: ["s3.services.k8s.aws"]
+        kinds: ["Bucket"]

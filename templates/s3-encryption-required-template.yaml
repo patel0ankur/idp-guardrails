@@ -3,7 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: s3encryptionrequired
   annotations:
-    description: Requires S3 buckets to have server-side KMS encryption configured
+    description: Requires S3 buckets to have server-side KMS encryption configured using the ACK S3 CRD field 'encryption'
 spec:
   crd:
     spec:
@@ -15,9 +15,10 @@ spec:
         package s3encryptionrequired
         violation[{"msg": msg}] {
           not has_encryption
-          msg := "S3 Bucket must have serverSideEncryptionConfiguration with aws:kms algorithm"
+          msg := "S3 Bucket must have spec.encryption.rules with aws:kms sseAlgorithm"
         }
         has_encryption {
-          rules := input.review.object.spec.serverSideEncryptionConfiguration.rules[_]
+          # ACK S3 CRD uses 'encryption' field (not serverSideEncryptionConfiguration)
+          rules := input.review.object.spec.encryption.rules[_]
           rules.applyServerSideEncryptionByDefault.sseAlgorithm == "aws:kms"
         }
